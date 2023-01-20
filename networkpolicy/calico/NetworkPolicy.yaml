@@ -1,0 +1,19 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  namespace: hmoon
+  name: allow-frontend
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: backend-app
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: frontend-app
+      ports:
+        - protocol: TCP
+          port: 4000

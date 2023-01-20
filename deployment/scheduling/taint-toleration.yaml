@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+  namespace: hmoon
+spec:
+  replicas: 3
+  selector:
+    matchLabels: # https://kubernetes.io/ko/docs/concepts/overview/working-with-objects/common-labels/
+      app.kubernetes.io/name: myapp
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: myapp
+    spec:
+      tolerations:
+        - key: "management"
+          operator: "Equal"       # "Equal", "Exists"
+          value: "core"           # operator가 "Equal"인 경우에만 사용합니다.
+          effect: "NoSchedule"    # "NoSchedule", "PreferNoSchedule", "NoExecute"
+        - key: "key1"
+          operator: "Exists"      # "Equal", "Exists"
+          effect: "NoExecute"     # "NoSchedule", "PreferNoSchedule", "NoExecute"
+          tolerationSeconds: 300  # taint node에 스케줄링 된 뒤 300초 뒤에 축출합니다. effect가 "NoExecute"인 경우에만 사용합니다.
+      containers:
+        - image: hmoon630/sample-fastapi
+          name: myapp
+          ports:
+            - containerPort: 5000
+          resources:
+            limits:
+              cpu: 820m
+              memory: 1000Mi
+            requests:
+              cpu: 820m
+              memory: 1000Mi
+      terminationGracePeriodSeconds: 60

@@ -1,0 +1,9 @@
+spec:
+  template:
+    spec:
+      nodeSelector:
+        management: addon
+      tolerations:
+      - key: management
+        value: addon
+        effect: NoSchedule
