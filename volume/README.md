@@ -12,6 +12,33 @@ eksctl create iamserviceaccount \
 ```
 
 2. Create Addon
+
+Required permission to create addon
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CreateAddon",
+      "Effect": "Allow",
+      "Action": [
+        "eks:DeleteAddon",
+        "eks:UpdateAddon",
+        "eks:CreateAddon",
+        "eks:DescribeAddon"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "PassDriverRole",
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": "arn:aws:iam::856210586235:role/AmazonEKS_EBS_CSI_DriverRole"
+    }
+  ]
+}
+```
+
 ```bash
 eksctl create addon \
     --name aws-ebs-csi-driver \
