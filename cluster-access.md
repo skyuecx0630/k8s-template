@@ -66,7 +66,8 @@ Bastion host에서 작업할 때 EKS를 조작하기 위한 최소한의 권한�
                 "iam:DeleteRole",
                 "iam:AttachRolePolicy"
                 "cloudformation:ListStacks",
-                "cloudformation:CreateStack","cloudformation:DeleteStack",
+                "cloudformation:CreateStack",
+                "cloudformation:DeleteStack",
                 "cloudformation:DescribeStacks"
             ],
             "Resource": "*"
