@@ -9,7 +9,7 @@ k8s 클러스터 구성에 필요한 템플릿 및 매뉴얼을 관리하는 레
 ### Install kubectl
 
 ```bash
-curl -LO "https://dl.k8s.io/release/v1.22.1/bin/linux/amd64/kubectl"
+curl -LO "https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl"
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 echo 'source <(kubectl completion bash)' >>~/.bashrc
 source <(kubectl completion bash)
