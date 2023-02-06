@@ -93,6 +93,7 @@ refer
     ```
     helm upgrade --install aws-cluster-autoscaler autoscaler/cluster-autoscaler -n kube-system \
     --set autoDiscovery.clusterName=<CLUSTER NAME> \
+    --set awsRegion=<REGION> \
     --set rbac.serviceAccount.create=false \
     --set rbac.serviceAccount.name=cluster-autoscaler \
     --set image.tag="v1.<VERSION>.0"
@@ -104,6 +105,7 @@ refer
         ```
         helm upgrade --install aws-cluster-autoscaler autoscaler/cluster-autoscaler -n kube-system \
         --set autoDiscovery.clusterName=<CLUSTER NAME> \
+        --set awsRegion=<REGION> \
         --set rbac.serviceAccount.create=false \
         --set rbac.serviceAccount.name=cluster-autoscaler \
         --set tolerations\[0\].key="management" \
