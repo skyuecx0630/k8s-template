@@ -14,5 +14,5 @@ kubectl patch deployment <DEPLOYMENT> --type merge --patch-file patch-deployment
 --set tolerations\[0\].key="management" \
 --set tolerations\[0\].value="addon" \
 --set tolerations\[0\].effect="NoSchedule" \
---set nodeSelector.management=addon \
+--set nodeSelector.management=addon
 ```
