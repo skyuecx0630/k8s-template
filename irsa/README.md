@@ -27,7 +27,7 @@ aws iam create-policy --policy-name my-policy --policy-document file://my-policy
 ```bash
 eksctl create iamserviceaccount \
     --name <SERVICE_ACCOUNT_NAME> \
-    --namespace hmoon \
+    --namespace <NAMESPACE> \
     --cluster <CLUSTER_NAME> \
     --role-name <ROLE_NAME> \
     --attach-policy-arn <POLICY_ARN> \

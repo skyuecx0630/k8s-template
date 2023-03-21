@@ -22,11 +22,11 @@ kubectl create namespace calico-system
 
 ```yaml
 installation:
-    kubernetesProvider: EKS
-    controlPlaneTolerations: # if you need taint/toleration.
-    - key: Management
-        value: Tools
-        effect: NoSchedule
+  kubernetesProvider: EKS
+  controlPlaneTolerations: # if you need taint/toleration.
+  - key: Management
+    value: Tools
+    effect: NoSchedule
 ```
 
 5. install calico using helm
