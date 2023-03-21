@@ -13,6 +13,15 @@ data:
           }
         },
         "force_flush_interval": 5
+      },
+      "metrics":{
+        "metrics_collected":{
+          "statsd":{
+            "service_address":":8125",
+            "metrics_collection_interval":60,
+            "metrics_aggregation_interval":300
+          }
+        }
       }
     }
 kind: ConfigMap
