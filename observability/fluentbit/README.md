@@ -50,5 +50,6 @@ wget https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-i
 ```
 
 modify `fluent-bit.yaml`
-- 위에서 Service Account for IAM Role을 생성했으니, Yaml 파일에서 Service Account 내용을 삭제합니다.
-- 삭제한뒤 수정된 yaml파일로 배포를 수행합니다.
+
+- Delete Service Account
+- Adjust CPU request according to your instance type
