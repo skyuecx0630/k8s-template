@@ -31,6 +31,7 @@ eksctl create iamserviceaccount \
     --cluster <CLUSTER_NAME> \
     --role-name <ROLE_NAME> \
     --attach-policy-arn <POLICY_ARN> \
+    --override-existing-serviceaccounts \
     --approve
 ```
 
