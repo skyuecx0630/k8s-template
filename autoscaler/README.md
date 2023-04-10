@@ -96,6 +96,7 @@ refer
     --set awsRegion=<REGION> \
     --set rbac.serviceAccount.create=false \
     --set rbac.serviceAccount.name=cluster-autoscaler \
+    --set extraArgs.ignore-daemonsets-utilization=true \
     --set image.tag="v1.<VERSION>.0"
     ```
 
@@ -112,5 +113,6 @@ refer
         --set tolerations\[0\].value="addon" \
         --set tolerations\[0\].effect="NoSchedule" \
         --set nodeSelector.management=addon \
+        --set extraArgs.ignore-daemonsets-utilization=true \
         --set image.tag="v1.<VERSION>.0"
         ```
