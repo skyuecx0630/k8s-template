@@ -8,9 +8,10 @@
 SERVICE_ACCOUNT_NAME=''
 NAMESPACE=''
 ROLE_NAME=''
+POLICY_NAME=''
 
 # Create policy for IRSA
-cat << EOF > /tmp/my-policy.json
+cat << EOF > /tmp/$POLICY_NAME.json
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -23,7 +24,7 @@ cat << EOF > /tmp/my-policy.json
 }
 EOF
 
-POLICY_ARN=$(aws iam create-policy --policy-name my-policy --policy-document file:///tmp/my-policy.json --query Policy.Arn --output text)
+POLICY_ARN=$(aws iam create-policy --policy-name $POLICY_NAME --policy-document file:///tmp/$POLICY_NAME.json --query Policy.Arn --output text)
 
 # Create IRSA
 eksctl create iamserviceaccount \
