@@ -1,42 +1,25 @@
-## calico
+# Calico operator
 
-1. add helm repo
-
-```bash
-helm repo add projectcalico https://docs.projectcalico.org/charts
-```
-
-2. update helm repo
+## Install Calico
 
 ```bash
-helm repo update
-```
+#!/bin/bash -eux
+CALICO_VERSION='v3.25.1'
 
-3. create namespace
-
-```bash
+# Add Helm repo
 kubectl create namespace calico-system
-```
+helm repo add projectcalico https://docs.projectcalico.org/charts
+helm repo update
 
-4. write `values.yaml`
-
-```yaml
+# Install Calico
+cat << EOF > /tmp/calico-values.yaml
 installation:
   kubernetesProvider: EKS
   controlPlaneTolerations: # if you need taint/toleration.
-  - key: Management
-    value: Tools
+  - key: $TOLERATION_KEY
+    value: $TOLERATION_VALUE
     effect: NoSchedule
-```
+EOF
 
-5. install calico using helm
-
-```bash
-helm install calico projectcalico/tigera-operator --version v3.21.4 --namespace calico-system -f values.yaml
-```
-
-6. uninstall calico
-
-```bash
-helm uninstall calico -n calico-system
+helm install calico projectcalico/tigera-operator --version $CALICO_VERSION --namespace calico-system -f /tmp/calico-values.yaml
 ```

@@ -8,6 +8,11 @@ Deployment들의 설정 값을 바꾸고 싶을 떄가 있을 것이다. 다른 
 kubectl patch deployment <DEPLOYMENT> --type merge --patch-file patch-deployment.yaml
 ```
 
+## patch coredns
+```bash
+kubectl patch deployments.apps coredns -n kube-system --type merge --patch '{"spec": {"template": {"spec": {"nodeSelector": {"management": "addon"}, "tolerations": [{"key": "management", "value": "addon", "effect": "NoSchedule"}]}}}}'
+```
+
 ## helm toleration and nodeSelector option
 
 ```bash

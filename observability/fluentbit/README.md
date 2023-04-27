@@ -1,18 +1,15 @@
+# Fluent bit
 
+## Install Fluent bit
 
-## fluentbit 배포
-
-fluentbit를 daemonset으로 배포합니다. 이는 아마존에서 제공해주는 기본 설정을 사용하며, 실제로는 커스텀하여 사용해야 합니다.
-
-create namespace
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-insights/latest/k8s-deployment-manifest-templates/deployment-mode/daemonset/container-insights-monitoring/cloudwatch-namespace.yaml
-```
+#!/bin/bash -eux
+# Create namespace
+kubectl create namespace amazon-cloudwatch
 
-create configmap
-```bash
-ClusterName=<my-cluster-name>
-RegionName=<my-cluster-region>
+# Create configmap
+ClusterName=$CLUSTER
+RegionName=$(aws configure get region)
 FluentBitHttpPort='2020'
 FluentBitReadFromHead='Off'
 [[ ${FluentBitReadFromHead} = 'On' ]] && FluentBitReadFromTail='Off'|| FluentBitReadFromTail='On'
@@ -24,32 +21,21 @@ kubectl create configmap fluent-bit-cluster-info \
 --from-literal=read.head=${FluentBitReadFromHead} \
 --from-literal=read.tail=${FluentBitReadFromTail} \
 --from-literal=logs.region=${RegionName} -n amazon-cloudwatch
-```
 
-associate oidc
-```bash
-eksctl utils associate-iam-oidc-provider \
---cluster <your-cluster-name> \
---approve
-```
-
-create irsa
-```bash
+# Create IRSA for fluent bit
 eksctl create iamserviceaccount \
---cluster=<your-cluster-name> \
+--cluster=$CLUSTER \
 --namespace=amazon-cloudwatch \
 --name=fluent-bit \
 --attach-policy-arn=arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy \
 --override-existing-serviceaccounts \
 --approve
-```
 
-download `fluent-bit.yaml` file
-```
-wget https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-insights/latest/k8s-deployment-manifest-templates/deployment-mode/daemonset/container-insights-monitoring/fluent-bit/fluent-bit.yaml
-```
+# Install fluent bit manifest
+curl -so /tmp/fluent-bit.yaml https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-insights/latest/k8s-deployment-manifest-templates/deployment-mode/daemonset/container-insights-monitoring/fluent-bit/fluent-bit.yaml
 
-modify `fluent-bit.yaml`
-
-- Delete Service Account
-- Adjust CPU request according to your instance type
+# Relete unnecessary service account & adjust cpu request
+sed -i 1,5d /tmp/fluent-bit.yaml
+sed -i 's/500m/200m/' /tmp/fluent-bit.yaml
+kubectl apply -f /tmp/fluent-bit.yaml
+```

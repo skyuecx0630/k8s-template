@@ -1,76 +1,86 @@
-## install
+# ArgoCD Image Updater
 
-### prerequisite
+## Prerequisite
 
-k8s application이 `Helm chart`나 `kustomize` 형태로 배포되어야 함.
+Manifests of ArgoCD application must be rendered using `Helm` or `Kustomize`
 
-### IRSA for pulling image
+## Install
 
 ```bash
+#!/bin/bash -eux
+REGION=$(aws configure get region)
+
 eksctl create iamserviceaccount \
---cluster=<your-cluster-name> \
+--cluster=$CLUSTER \
 --namespace=argocd \
 --name=argocd-image-updater \
 --attach-policy-arn=arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly \
 --override-existing-serviceaccounts \
 --approve
-```
 
-### installation
+cat << EOF > /tmp/argocd-image-updater-values.yaml
+config:
+  argocd:
+    serverAddress: "argocd-server"
+  registries:
+    - name: ECR
+      api_url: https://$AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
+      prefix: $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
+      ping: yes
+      insecure: no
+      credentials: ext:/scripts/ecr.sh
+      credsexpire: 10h
+authScripts:
+  enabled: true
+  scripts:
+    ecr.sh: |
+      #!/bin/sh
+      aws ecr --region $REGION get-authorization-token --output text --query 'authorizationData[].authorizationToken' | base64 -d
+serviceAccount:
+  create: false
+  name: "argocd-image-updater"
+nodeSelector:
+  $TOLERATION_KEY: $TOLERATION_VALUE
+tolerations:
+  - key: $TOLERATION_KEY
+    value: $TOLERATION_VALUE
+    effect: NoSchedule
+EOF
 
-`values.yaml`을 수정 후 배포
-- ECR registry
-- tolerations & nodeSelector
-- aws region
+helm upgrade --install argocd-image-updater -n argocd argo/argocd-image-updater -f /tmp/argocd-image-updater-values.yaml
 
-```bash
-helm upgrade --install argocd-image-updater -n argocd argo/argocd-image-updater -f values.yaml
-```
-
-### argocd account
-
-argocd에 연결하기 위한 account를 생성한다.
-
-```bash
-kubectl edit configmap argocd-cm -n argocd
-```
-```yaml
-apiVersion: v1
-kind: ConfigMap
+# Create account for image updater
+cat << EOF > /tmp/argocd-cm.yaml
 data:
-  accounts.image-updater: apiKey 
-```
+  accounts.image-updater: apiKey
+EOF
 
-account에 권한을 부여한다.
+kubectl patch configmaps argocd-cm -n argocd --type merge --patch-file /tmp/argocd-cm.yaml
 
-```bash
-kubectl edit configmap argocd-rbac-cm -n argocd
-```
-```yaml
-apiVersion: v1
-kind: ConfigMap
+# Grant policy to account
+cat << EOF > /tmp/argocd-rbac-cm.yaml
 data:
   policy.csv: |
     p, role:image-updater, applications, get, */*, allow
     p, role:image-updater, applications, update, */*, allow
     g, image-updater, role:image-updater
   policy.default: role.readonly
-```
+EOF
 
-secret을 생성하여 image updater가 토큰에 접근하도록 한다.
+kubectl patch configmap argocd-rbac-cm -n argocd --type merge --patch-file /tmp/argocd-rbac-cm.yaml
 
-```bash
-TOKEN=`argocd account generate-token --account image-updater --id image-updater`
+# Create secret for image updater
+IMAGE_UPDATER_TOKEN=$(argocd account generate-token --account image-updater --id image-updater)
 
-kubectl create secret generic argocd-image-updater-secret -n argocd --from-literal argocd.token=$TOKEN
+kubectl create secret generic argocd-image-updater-secret -n argocd --from-literal argocd.token=$IMAGE_UPDATER_TOKEN
 ```
 
 ### annotation
 
-만약 ArgoCD Application 내에 여러 Deployment나 Image를 사용하고 있다면, app=<IMAGE_URL> 에서 app 부분을 여러개로 두어 사용 가능하다.
+[ref](https://argocd-image-updater.readthedocs.io/en/stable/configuration/images/)
 
 ```bash
 kubectl annotate applications <APP_NAME> -n argocd \
-argocd-image-updater.argoproj.io/app.update-strategy=semver \
+argocd-image-updater.argoproj.io/update-strategy=semver \
 argocd-image-updater.argoproj.io/image-list=app=<IMAGE_URL>
 ```
