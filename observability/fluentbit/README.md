@@ -5,7 +5,7 @@
 ```bash
 #!/bin/bash -eux
 # Create namespace
-kubectl create namespace amazon-cloudwatch
+kubectl create namespace amazon-cloudwatch || exit 0
 
 # Create configmap
 ClusterName=$CLUSTER
