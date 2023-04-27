@@ -5,7 +5,7 @@
 ```bash
 #!/bin/bash -eux
 # Create namespace for CWAgent
-kubectl create namespace amazon-cloudwatch || exit 0
+kubectl create namespace amazon-cloudwatch || true
 
 # Create IRSA for CWAgent
 kubectl apply -f https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-insights/latest/k8s-deployment-manifest-templates/deployment-mode/daemonset/container-insights-monitoring/cwagent/cwagent-serviceaccount.yaml
