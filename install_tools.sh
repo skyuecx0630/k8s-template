@@ -27,7 +27,7 @@ source <(eksctl completion bash)
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
 # Download k9s
-curl -s https://github.com/derailed/k9s/releases/download/v0.27.3/k9s_Linux_$ARCH.tar.gz | tar xz -C /tmp
+curl -sL https://github.com/derailed/k9s/releases/download/v0.27.3/k9s_Linux_$ARCH.tar.gz | tar xz -C /tmp
 sudo mv /tmp/k9s /usr/local/bin
 
 # Configure EKS variables on shell login
