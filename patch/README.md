@@ -10,14 +10,14 @@ kubectl patch deployment <DEPLOYMENT> --type merge --patch-file patch-deployment
 
 ## patch coredns
 ```bash
-kubectl patch deployments.apps coredns -n kube-system --type merge --patch '{"spec": {"template": {"spec": {"nodeSelector": {"management": "addon"}, "tolerations": [{"key": "management", "value": "addon", "effect": "NoSchedule"}]}}}}'
+kubectl patch deployments.apps coredns -n kube-system --type merge --patch '{"spec": {"template": {"spec": {"nodeSelector": {"'$TOLERATION_KEY'": "'$TOLERATION_VALUE'"}, "tolerations": [{"key": "'$TOLERATION_KEY'", "value": "'$TOLERATION_VALUE'", "effect": "NoSchedule"}]}}}}'
 ```
 
 ## helm toleration and nodeSelector option
 
 ```bash
---set tolerations\[0\].key="management" \
---set tolerations\[0\].value="addon" \
+--set tolerations\[0\].key="$TOLERATION_KEY" \
+--set tolerations\[0\].value="$TOLERATION_VALUE" \
 --set tolerations\[0\].effect="NoSchedule" \
---set nodeSelector.management=addon
+--set nodeSelector.$TOLERATION_KEY=$TOLERATION_VALUE
 ```
