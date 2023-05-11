@@ -2,7 +2,7 @@
 
 ## Cluster created by IAM user
 
-When a cluster is set up for the first time, only a user who created EKS Cluster can access a cluster.
+When a cluster is set up for the first time, only a user who created EKS cluster can access to it.
 
 This user can make other users/roles to access to a cluster.
 
@@ -16,7 +16,7 @@ eksctl create iamidentitymapping \
 
 ```bash
 aws eks update-kubeconfig \
-  --name $CLUSTER \
+  --name $CLUSTER
 ```
 
 ## IAM policy for IAM role
