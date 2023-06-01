@@ -1,7 +1,7 @@
-
 # Cluodwatch Agent daemonset
 
-## Install CWAgent 
+## Install CWAgent
+
 ```bash
 #!/bin/bash -eux
 # Create namespace for CWAgent
@@ -16,7 +16,7 @@ eksctl create iamserviceaccount \
   --name=cloudwatch-agent \
   --attach-policy-arn=arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy \
   --override-existing-serviceaccounts \
-  --approve
+  --approve &
 
 # Download CWAgent configmap
 curl -so /tmp/cwagent-configmap.yaml https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-insights/latest/k8s-deployment-manifest-templates/deployment-mode/daemonset/container-insights-monitoring/cwagent/cwagent-configmap.yaml

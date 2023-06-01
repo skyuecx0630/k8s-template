@@ -61,7 +61,7 @@ eksctl create iamserviceaccount \
     --name=cluster-autoscaler \
     --attach-policy-arn=arn:aws:iam::$AWS_ACCOUNT_ID:policy/AmazonEKSClusterAutoscalerPolicy \
     --override-existing-serviceaccounts \
-    --approve
+    --approve &
 
 # Install Cluster Autoscaler
 helm repo add autoscaler https://kubernetes.github.io/autoscaler

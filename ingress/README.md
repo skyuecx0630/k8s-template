@@ -21,9 +21,9 @@ eksctl create iamserviceaccount \
     --name=aws-load-balancer-controller \
     --attach-policy-arn=arn:aws:iam::$AWS_ACCOUNT_ID:policy/AWSLoadBalancerControllerIAMPolicy \
     --override-existing-serviceaccounts \
-    --approve
+    --approve &
 
-# Deploy AWS Load Balancer controller with toleration 
+# Deploy AWS Load Balancer controller with toleration
 helm repo add eks https://aws.github.io/eks-charts
 
 helm upgrade --install aws-load-balancer-controller eks/aws-load-balancer-controller \
