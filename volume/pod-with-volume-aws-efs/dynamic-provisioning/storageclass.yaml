@@ -6,7 +6,7 @@ provisioner: efs.csi.aws.com
 parameters:
   provisioningMode: efs-ap
   fileSystemId: <efs id> # ex. fs-92107410
-  directoryPerms: "700"
+  directoryPerms: "755"
   gidRangeStart: "1000" # optional
   gidRangeEnd: "2000" # optional
   basePath: "/dynamic_provisioning" # optional
