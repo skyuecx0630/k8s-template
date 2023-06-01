@@ -1,6 +1,9 @@
 #!/bin/bash -eu
 # Determine k8s version and host architecture
-KUBEVERSION=v1.25.0
+KUBEVERSION=v1.27.2
+CLUSTER_NAME='skills-cluster'
+TOLERATION_KEY='management'
+TOLERATION_VALUE='addon'
 ARCH=""
 case $(uname -m) in
     x86_64) ARCH="amd64" ;;
@@ -39,10 +42,10 @@ case \$(uname -m) in
     aarch64) export ARCH="arm64" ;;
 esac
 
-CLUSTER='skills-cluster' && export CLUSTER
+CLUSTER='$CLUSTER_NAME' && export CLUSTER
 AWS_ACCOUNT_ID=\$(aws sts get-caller-identity --query "Account" --output text) && export AWS_ACCOUNT_ID
-TOLERATION_KEY='management' && export TOLERATION_KEY
-TOLERATION_VALUE='addon' && export TOLERATION_VALUE
+TOLERATION_KEY='$TOLERATION_KEY' && export TOLERATION_KEY
+TOLERATION_VALUE='$TOLERATION_VALUE' && export TOLERATION_VALUE
 HELM_TOLERATION='--set tolerations[0].key='\$TOLERATION_KEY' --set tolerations[0].value='\$TOLERATION_VALUE' --set tolerations[0].effect=NoSchedule --set nodeSelector.'\$TOLERATION_KEY'='\$TOLERATION_VALUE && export HELM_TOLERATION
 EOF
 
