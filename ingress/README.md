@@ -5,7 +5,7 @@
 ```bash
 #!/bin/bash -eux
 # Create TargetGroup CRD
-kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master" &
+kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller/crds?ref=master" &
 
 # Download IAM policy for IRSA
 curl -so /tmp/iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.1/docs/install/iam_policy.json
