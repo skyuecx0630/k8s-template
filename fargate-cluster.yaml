@@ -1,0 +1,49 @@
+# An example of ClusterConfig object using an existing VPC:
+---
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: skills-cluster
+  region: us-west-2
+#   version: 1.27
+
+vpc:
+  id: "vpc-0b4568017ac28dff6" # (Optional) Existing VPC id
+  # cidr: "192.168.0.0/16"        # (Optional when using existing VPC)
+  subnets:
+    private:
+      us-west-2a:
+        id: "subnet-0034b131e0a4debee" # (Optional) Existing subnet id
+        # cidr: "192.168.128.0/19"        # (Optional when using existing subnet)
+      us-west-2b:
+        id: "subnet-076160106d56a93de" # (Optional) Existing subnet id
+        # cidr: "192.168.64.0/19"         # (Optional when using existing subnet)
+      # us-west-2c:
+      #   id: "subnet-00f71956cdec8f1dc"  # (Optional) Existing subnet id
+      #   cidr: "192.168.0.0/19"          # (Optional when using existing subnet)
+  clusterEndpoints:
+    privateAccess: true
+    publicAccess: false
+  # controlPlaneSubnetIDs: []     # (Optional) Specify control plane subnets, it's ideal for public access
+
+iam:
+  withOIDC: true
+#   serviceRoleARN: ""
+
+cloudwatch:
+  clusterLogging:
+    enableTypes:
+      - "all"
+
+fargateProfiles:
+  - name: kube-system
+    selectors:
+      - namespace: kube-system
+    subnets: []
+  - name: karpenter
+    selectors:
+      - namespace: karpenter
+        labels:
+          app.kubernetes.io/name: karpenter
+    subnets: []
