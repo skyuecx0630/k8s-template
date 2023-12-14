@@ -1,4 +1,3 @@
-
 ## Create IRSA for pod
 
 ### YOU SHOULD DEFINE YOUR OWN POLICY AND OTHER VARIABLES
@@ -34,8 +33,9 @@ eksctl create iamserviceaccount \
     --role-name $ROLE_NAME \
     --attach-policy-arn $POLICY_ARN \
     --override-existing-serviceaccounts \
-    --approve
+    --approve &
 ```
 
 ## Ref
+
 https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html

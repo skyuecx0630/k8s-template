@@ -2,8 +2,17 @@
 
 ## Install Metrics server & Cluster autoscaler
 
+- [Descheduler helm chart](https://github.com/kubernetes-sigs/descheduler/tree/master/charts/descheduler)
+- [Cluster Autoscaler helm chart](https://github.com/kubernetes/autoscaler/tree/master/charts/cluster-autoscaler)
+
 ```bash
 #!/bin/bash -eux
+
+# Install Descheduler
+helm repo add descheduler https://kubernetes-sigs.github.io/descheduler/
+helm upgrade --install descheduler -n kube-system descheduler/descheduler \
+    --set deschedulerPolicy.strategies.RemovePodsViolatingTopologySpreadConstraint.params.includeSoftConstraints=true \
+    $HELM_TOLERATION
 
 # Install metrics server
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
@@ -52,12 +61,10 @@ eksctl create iamserviceaccount \
     --name=cluster-autoscaler \
     --attach-policy-arn=arn:aws:iam::$AWS_ACCOUNT_ID:policy/AmazonEKSClusterAutoscalerPolicy \
     --override-existing-serviceaccounts \
-    --approve
+    --approve &
 
 # Install Cluster Autoscaler
 helm repo add autoscaler https://kubernetes.github.io/autoscaler
-
-KUBE_VERSION=$(kubectl version -o json | jq -rj '.serverVersion|.gitVersion[:5],".0"')
 
 helm upgrade --install aws-cluster-autoscaler autoscaler/cluster-autoscaler -n kube-system \
 --set autoDiscovery.clusterName=$CLUSTER \
@@ -65,6 +72,6 @@ helm upgrade --install aws-cluster-autoscaler autoscaler/cluster-autoscaler -n k
 --set rbac.serviceAccount.create=false \
 --set rbac.serviceAccount.name=cluster-autoscaler \
 --set extraArgs.ignore-daemonsets-utilization=true \
---set image.tag=$KUBE_VERSION \
-$HELM_TOLERATION
+$HELM_TOLERATION \
+# --set image.tag=$SPECIFY_IMAGE_VERSION \
 ```

@@ -1,7 +1,9 @@
 #!/bin/bash -eu
+
 # Determine k8s version and host architecture
-KUBEVERSION=v1.25.0
-ARCH=""
+CLUSTER='skills-cluster'
+# TOLERATION_KEY='management'
+# TOLERATION_VALUE='addon'
 case $(uname -m) in
     x86_64) ARCH="amd64" ;;
     aarch64) ARCH="arm64" ;;
@@ -11,7 +13,7 @@ esac
 sudo yum install -y git jq
 
 # Download kubectl
-curl -LO "https://dl.k8s.io/release/$KUBEVERSION/bin/linux/$ARCH/kubectl"
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$ARCH/kubectl"
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 rm kubectl
 echo 'source <(kubectl completion bash)' >> ~/.bashrc
@@ -39,11 +41,11 @@ case \$(uname -m) in
     aarch64) export ARCH="arm64" ;;
 esac
 
-CLUSTER='skills-cluster' && export CLUSTER
+CLUSTER='$CLUSTER' && export CLUSTER
 AWS_ACCOUNT_ID=\$(aws sts get-caller-identity --query "Account" --output text) && export AWS_ACCOUNT_ID
-TOLERATION_KEY='management' && export TOLERATION_KEY
-TOLERATION_VALUE='addon' && export TOLERATION_VALUE
-HELM_TOLERATION='--set tolerations[0].key='\$TOLERATION_KEY' --set tolerations[0].value='\$TOLERATION_VALUE' --set tolerations[0].effect=NoSchedule --set nodeSelector.'\$TOLERATION_KEY'='\$TOLERATION_VALUE && export HELM_TOLERATION
+# TOLERATION_KEY='$TOLERATION_KEY' && export TOLERATION_KEY
+# TOLERATION_VALUE='$TOLERATION_VALUE' && export TOLERATION_VALUE
+# HELM_TOLERATION='--set tolerations[0].key='\$TOLERATION_KEY' --set tolerations[0].value='\$TOLERATION_VALUE' --set tolerations[0].effect=NoSchedule --set nodeSelector.'\$TOLERATION_KEY'='\$TOLERATION_VALUE && export HELM_TOLERATION
 EOF
 
 source ~/.kubevar.sh

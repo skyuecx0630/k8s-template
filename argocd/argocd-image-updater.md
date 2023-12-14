@@ -16,7 +16,7 @@ eksctl create iamserviceaccount \
 --name=argocd-image-updater \
 --attach-policy-arn=arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly \
 --override-existing-serviceaccounts \
---approve
+--approve &
 
 cat << EOF > /tmp/argocd-image-updater-values.yaml
 config:

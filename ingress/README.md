@@ -5,7 +5,7 @@
 ```bash
 #!/bin/bash -eux
 # Create TargetGroup CRD
-kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master" &
+kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller/crds?ref=master" &
 
 # Download IAM policy for IRSA
 curl -so /tmp/iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.1/docs/install/iam_policy.json
@@ -21,9 +21,9 @@ eksctl create iamserviceaccount \
     --name=aws-load-balancer-controller \
     --attach-policy-arn=arn:aws:iam::$AWS_ACCOUNT_ID:policy/AWSLoadBalancerControllerIAMPolicy \
     --override-existing-serviceaccounts \
-    --approve
+    --approve &
 
-# Deploy AWS Load Balancer controller with toleration 
+# Deploy AWS Load Balancer controller with toleration
 helm repo add eks https://aws.github.io/eks-charts
 
 helm upgrade --install aws-load-balancer-controller eks/aws-load-balancer-controller \
