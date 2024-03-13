@@ -4,6 +4,6 @@ spec:
       nodeSelector:
         management: addon
       tolerations:
-      - key: management
-        value: addon
-        effect: NoSchedule
+        - key: management
+          value: addon
+          effect: NoSchedule

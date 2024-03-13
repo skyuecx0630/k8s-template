@@ -5,14 +5,18 @@ metadata:
   namespace: hmoon
 spec:
   containers:
-  - name: app1
-    image: busybox
-    command: ["/bin/sh"]
-    args: ["-c", "while true; do echo $(date -u) >> /data/out1.txt; sleep 5; done"]
-    volumeMounts:
-    - name: persistent-storage
-      mountPath: /data
+    - name: app1
+      image: busybox
+      command: ["/bin/sh"]
+      args:
+        [
+          "-c",
+          "while true; do echo $(date -u) >> /data/out1.txt; sleep 5; done",
+        ]
+      volumeMounts:
+        - name: persistent-storage
+          mountPath: /data
   volumes:
-  - name: persistent-storage
-    persistentVolumeClaim:
-      claimName: efs-claim
+    - name: persistent-storage
+      persistentVolumeClaim:
+        claimName: efs-claim

@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+  namespace: hmoon
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: "25%"
+      maxUnavailable: "25%"
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: myapp
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: myapp
+    spec:
+      # serviceAccountName: foo-myapp
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: "topology.kubernetes.io/zone"
+          whenUnsatisfiable: "ScheduleAnyway" # "DoNotSchedule", "ScheduleAnyway"
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: myapp
+      tolerations:
+        - key: "Management"
+          operator: "Equal" # "Equal", "Exists"
+          value: "Apps" # operator가 "Equal"인 경우에만 사용합니다.
+          effect: "NoSchedule" # "NoSchedule", "PreferNoSchedule", "NoExecute"
+      containers:
+        - image: hmoon630/sample-fastapi
+          name: myapp
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: 200m
+              memory: 400Mi
+            requests:
+              cpu: 200m
+              memory: 400Mi
+          # startupProbe:
+          # livenessProbe:
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            # exec:
+            #   command:
+            #   - curl
+            #   - localhost:8080
+            initialDelaySeconds: 0 # default 0, 어플리케이션이 시작될때까지 기다리는 시간입니다.
+            periodSeconds: 5 # default 10, Healthcheck 요청을 보내는 주기(Interval)입니다.
+            timeoutSeconds: 3 # default 1, Healthcheck 요청의 타임아웃 값입니다.
+            failureThreshold: 3 # default 3, n번 이상 실패하면 요청을 받지 않습니다.
+            successThreshold: 1 # default 1, n번 이상 성공하면 요청을 받습니다.
+          lifecycle:
+            # postStart:
+            #   exec:
+            #     command: ["/bin/sh","-c","sleep 100"]
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 3"]
+      terminationGracePeriodSeconds: 60
