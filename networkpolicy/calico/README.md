@@ -15,11 +15,12 @@ helm repo update
 cat << EOF > /tmp/calico-values.yaml
 installation:
   kubernetesProvider: EKS
-  controlPlaneTolerations: # if you need taint/toleration.
-  - key: $TOLERATION_KEY
-    value: $TOLERATION_VALUE
-    effect: NoSchedule
 EOF
 
-helm install calico projectcalico/tigera-operator --version $CALICO_VERSION --namespace calico-system -f /tmp/calico-values.yaml
+helm upgrade calico \
+    --version $CALICO_VERSION \
+    --namespace calico-system \
+    -f /tmp/calico-values.yaml \
+    projectcalico/tigera-operator \
+    $HELM_TOLERATION
 ```
