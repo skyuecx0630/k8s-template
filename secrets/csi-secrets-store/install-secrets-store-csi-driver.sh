@@ -8,7 +8,9 @@ helm upgrade --install -n kube-system csi-secrets-store \
     --set syncSecret.enabled=false \
     --set enableSecretRotation=true \
     --set rotationPollInterval=5s \
-    secrets-store-csi-driver/secrets-store-csi-driver
+    secrets-store-csi-driver/secrets-store-csi-driver \
+    $HELM_TOLERATION
 
 helm upgrade --install -n kube-system secrets-provider-aws \
-    aws-secrets-manager/secrets-store-csi-driver-provider-aws
+    aws-secrets-manager/secrets-store-csi-driver-provider-aws \
+    $HELM_TOLERATION
