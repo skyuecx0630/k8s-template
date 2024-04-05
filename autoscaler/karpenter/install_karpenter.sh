@@ -8,4 +8,5 @@ helm logout public.ecr.aws
 
 helm upgrade --install karpenter oci://public.ecr.aws/karpenter/karpenter --version "${KARPENTER_VERSION}" --namespace "${KARPENTER_NAMESPACE}" \
   --set "serviceAccount.annotations.eks\.amazonaws\.com/role-arn=${KARPENTER_IAM_ROLE_ARN}" \
-  --set "settings.clusterName=${CLUSTER_NAME}"
+  --set "settings.clusterName=${CLUSTER_NAME}" \
+  $HELM_TOLERATION

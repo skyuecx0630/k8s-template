@@ -6,7 +6,11 @@ INGRESS_NAMESPACE="default"
 # Install KEDA operator and metrics server
 helm repo add kedacore https://kedacore.github.io/charts
 helm repo update
-helm install keda kedacore/keda --namespace keda --create-namespace
+helm upgrade --install keda \
+    --namespace keda \
+    --create-namespace \
+    kedacore/keda \
+    $HELM_TOLERATION
 
 # Create IRSA for ScaledObject to query CloudWatch metrics
 eksctl create iamserviceaccount \
