@@ -15,8 +15,11 @@ helm upgrade --install descheduler -n kube-system descheduler/descheduler \
     $HELM_TOLERATION
 
 # Install metrics server
+# --set containerPort=10251 is required for Fargate
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-helm upgrade --install metrics-server metrics-server/metrics-server -n kube-system $HELM_TOLERATION
+helm upgrade --install metrics-server metrics-server/metrics-server -n kube-system \
+    # --set containerPort=10251 \
+    $HELM_TOLERATION
 
 # Craete IAM poilcy for IRSA
 cat << EOF > /tmp/cluster-autoscaler-policy.json
