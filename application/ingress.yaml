@@ -5,7 +5,6 @@ metadata:
   namespace: hmoon
   annotations:
     alb.ingress.kubernetes.io/load-balancer-name: myapp-alb
-    kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: "ip"
     alb.ingress.kubernetes.io/subnets: subnet-id # Use name tag of subnet. Or subnet id
@@ -22,12 +21,15 @@ metadata:
 
     alb.ingress.kubernetes.io/actions.response-404: >
       {"type":"fixed-response","fixedResponseConfig":{"contentType":"text/plain","statusCode":"404","messageBody":"404 Not Found"}}
+    # alb.ingress.kubernetes.io/actions.myapp-sampling: >
+    #   {"type":"forward","forwardConfig":{"targetGroups":[{"serviceName":"myapp","servicePort":8080,"weight":20},{"serviceName":"myapp-sampler","servicePort":8080,"weight":20}]}}
 
 spec:
   # # https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.5/guide/ingress/cert_discovery/
   # tls:
   #   - hosts:
   #     - api.example.com
+  ingressClassName: alb
   defaultBackend:
     service:
       name: response-404
@@ -42,4 +44,13 @@ spec:
               service:
                 name: myapp
                 port:
-                  number: 80 # Use service's port number
+                  number: 8080 # Use service's port number
+    # - http:
+    #     paths:
+    #       - path: /
+    #         pathType: Exact # Prefix | Exact
+    #         backend:
+    #           service:
+    #             name: myapp-sampling
+    #             port:
+    #               name: use-annotation

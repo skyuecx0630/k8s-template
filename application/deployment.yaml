@@ -31,6 +31,31 @@ spec:
           value: "Apps" # operator가 "Equal"인 경우에만 사용합니다.
           effect: "NoSchedule" # "NoSchedule", "PreferNoSchedule", "NoExecute"
       containers:
+        # - image: public.ecr.aws/g1s2t7w5/sampler:latest
+        #   imagePullPolicy: Always
+        #   name: sampler
+        #   ports:
+        #     - containerPort: 8888
+        #   resources:
+        #     limits:
+        #       cpu: 50m
+        #       memory: 100Mi
+        #     requests:
+        #       cpu: 50m
+        #       memory: 100Mi
+        #   readinessProbe:
+        #     httpGet:
+        #       path: /dummy/health
+        #       port: 8888
+        #   env:
+        #     - name: PORT
+        #       value: "8888"
+        #     - name: UPSTREAM_ENDPOINT
+        #       value: "http://localhost:8080"
+        #     - name: IGNORE_PATH
+        #       value: "/favicon.ico, /helloworld"
+        #     - name: IGNORE_HEALTH_CHECK
+        #       value: "1"
         - image: hmoon630/sample-fastapi
           name: myapp
           ports:
@@ -63,5 +88,35 @@ spec:
             #     command: ["/bin/sh","-c","sleep 100"]
             preStop:
               exec:
-                command: ["/bin/sh", "-c", "sleep 3"]
-      terminationGracePeriodSeconds: 60
+                command: ["/bin/sh", "-c", "sleep 30"]
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+  namespace: hmoon
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: myapp
+  ports:
+    - protocol: TCP
+      port: 8080 # Service port number
+      targetPort: 8080
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: myapp-sampler
+#   namespace: hmoon
+#   # annotations:
+#   #   alb.ingress.kubernetes.io/healthcheck-path: /dummy/health
+# spec:
+#   type: ClusterIP
+#   selector:
+#     app.kubernetes.io/name: myapp
+#   ports:
+#     - protocol: TCP
+#       port: 8080 # Service port number
+#       targetPort: 8888
