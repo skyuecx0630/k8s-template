@@ -2,7 +2,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: myapp-alb
-  namespace: hmoon
   annotations:
     alb.ingress.kubernetes.io/load-balancer-name: myapp-alb
     alb.ingress.kubernetes.io/scheme: internet-facing

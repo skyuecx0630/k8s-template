@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: myapp
-  namespace: hmoon
 spec:
   strategy:
     type: RollingUpdate
@@ -90,26 +89,11 @@ spec:
               exec:
                 command: ["/bin/sh", "-c", "sleep 30"]
       terminationGracePeriodSeconds: 30
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: myapp
-  namespace: hmoon
-spec:
-  type: ClusterIP
-  selector:
-    app.kubernetes.io/name: myapp
-  ports:
-    - protocol: TCP
-      port: 8080 # Service port number
-      targetPort: 8080
 # ---
 # apiVersion: v1
 # kind: Service
 # metadata:
 #   name: myapp-sampler
-#   namespace: hmoon
 #   # annotations:
 #   #   alb.ingress.kubernetes.io/healthcheck-path: /dummy/health
 # spec:
@@ -120,3 +104,16 @@ spec:
 #     - protocol: TCP
 #       port: 8080 # Service port number
 #       targetPort: 8888
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: myapp
+  ports:
+    - protocol: TCP
+      port: 8080 # Service port number
+      targetPort: 8080

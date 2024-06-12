@@ -1,7 +1,6 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  namespace: hmoon
   name: default-deny
 spec:
   podSelector: {}

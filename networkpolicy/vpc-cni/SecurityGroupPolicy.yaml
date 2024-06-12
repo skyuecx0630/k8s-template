@@ -2,7 +2,6 @@ apiVersion: vpcresources.k8s.aws/v1beta1
 kind: SecurityGroupPolicy
 metadata:
   name: myapp-security-group
-  namespace: hmoon
 spec:
   podSelector:
     matchLabels:
