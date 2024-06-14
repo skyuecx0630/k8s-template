@@ -1,0 +1,78 @@
+{{- if .Values.ingress.enabled }}
+{{- with .Values.ingress }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .name }}
+  annotations:
+    alb.ingress.kubernetes.io/load-balancer-name: {{ .name }}
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: "ip"
+    alb.ingress.kubernetes.io/subnets: {{ join ", " .subnets }} # Use name tag of subnet. Or subnet id
+    alb.ingress.kubernetes.io/security-groups: {{ join ", " .securityGroups }}
+    # alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    # alb.ingress.kubernetes.io/load-balancer-attributes: access_logs.s3.enabled=true,access_logs.s3.bucket=MY_LOG_BUCKET
+
+    # alb.ingress.kubernetes.io/healthcheck-path: /health
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: "5"
+    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: "3"
+    alb.ingress.kubernetes.io/unhealthy-threshold-count: "3"
+    alb.ingress.kubernetes.io/healthy-threshold-count: "2" # minimum 2
+    # alb.ingress.kubernetes.io/target-group-attributes: deregistration_delay.timeout_seconds=30
+
+    alb.ingress.kubernetes.io/actions.response-404: >
+      {"type":"fixed-response","fixedResponseConfig":{"contentType":"text/plain","statusCode":"404","messageBody":"404 Not Found"}}
+    {{- range $.Values.apps }}
+    {{- if .sampler.enabled }}
+    alb.ingress.kubernetes.io/actions.{{ .name }}-sampling: |-
+      {"type":"forward","forwardConfig":{"targetGroups":[{"serviceName":"{{ .name }}","servicePort":{{ .servicePort }},"weight":{{ sub 100 .sampler.weight }}},{"serviceName":"{{ .name }}-sampler","servicePort":{{ $.Values.sampler.servicePort }},"weight":{{ .sampler.weight }}}]}}
+    {{- end }}
+    {{- end }}
+    # alb.ingress.kubernetes.io/actions.myapp-sampling: >
+    #   {"type":"forward","forwardConfig":{"targetGroups":[{"serviceName":"myapp","servicePort":8080,"weight":20},{"serviceName":"myapp-sampler","servicePort":8080,"weight":20}]}}
+
+spec:
+  # # https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.5/guide/ingress/cert_discovery/
+  # tls:
+  #   - hosts:
+  #     - api.example.com
+  ingressClassName: alb
+  defaultBackend:
+    service:
+      name: response-404
+      port:
+        name: use-annotation
+  rules:
+    {{- range .rules }}
+    {{- $app := .app }}
+    - http:
+        paths:
+          - path: {{ .path }}
+            pathType: {{ .pathType }} # Prefix | Exact
+            backend:
+              service:
+              {{- range $.Values.apps }}
+              {{- if eq $app .name }}
+                {{- if .sampler.enabled }}
+                name: {{ .name }}-sampling
+                port:
+                  name: use-annotation
+                {{- end }}
+                {{- else }}
+                name: {{ .name }}
+                port:
+                  number: {{ .port }}
+                {{- end }}
+              {{- end }}
+              {{- end }}
+    {{- end }}
+    # - http:
+    #     paths:
+    #       - path: /
+    #         pathType: Exact # Prefix | Exact
+    #         backend:
+    #           service:
+    #             name: myapp-sampling
+    #             port:
+    #               name: use-annotation
+{{- end }}

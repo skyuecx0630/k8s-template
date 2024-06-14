@@ -1,0 +1,103 @@
+{{- range .Values.apps }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: "25%"
+      maxUnavailable: "25%"
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .name }}
+    spec:
+      {{- if .serviceAccountName }}
+      serviceAccountName: {{ .serviceAccountName }}
+      {{- end }}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: "topology.kubernetes.io/zone"
+          whenUnsatisfiable: "ScheduleAnyway"
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ .name }}
+      {{- if $.Values.tolerations }}
+      tolerations:
+      {{- range $.Values.tolerations }}
+        - key: {{ .key }}
+          operator: "Equal"
+          value: {{ .value }}
+          effect: "NoSchedule"
+      {{- end }}
+      nodeSelector:
+      {{- range $.Values.tolerations }}
+        {{ .key }}: {{ .value }}
+      {{- end }}
+      {{- end }}
+      containers:
+        {{- if .sampler.enabled }}
+        - image: {{ $.Values.sampler.image }}
+          imagePullPolicy: Always
+          name: {{ $.Values.sampler.name }}
+          ports:
+            - containerPort: {{ $.Values.sampler.port }}
+          resources:
+            {{- toYaml $.Values.sampler.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /dummy/health
+              port: {{ $.Values.sampler.port }}
+          env:
+            - name: PORT
+              value: {{ $.Values.sampler.port | quote }}
+            - name: UPSTREAM_ENDPOINT
+              value: {{ printf "http://localhost:%d" .port }}
+            {{- toYaml $.Values.sampler.env | nindent 12 }}
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - "/bin/sh"
+                  - "-c"
+                  - {{ printf "sleep %d" .terminationGracePeriodSeconds | quote }}
+        {{- end }}
+        - image: {{ .image }}
+          name: {{ .name }}
+          ports:
+            - containerPort: {{ .port }}
+          resources:
+            {{- toYaml .resources | nindent 12 }}
+          {{- if .env }}
+          env:
+            {{- toYaml .env | nindent 12 }}
+          {{- end }}
+          readinessProbe:
+            httpGet:
+              path: {{ .healthCheckPath }}
+              port: {{ .port }}
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+            successThreshold: 1
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - "/bin/sh"
+                  - "-c"
+                  - "sleep {{ .terminationGracePeriodSeconds }}"
+          {{- if .additionalContainerConfig }}
+          {{- toYaml .additionalContainerConfig | nindent 10 }}
+          {{- end }}
+      terminationGracePeriodSeconds: {{ .terminationGracePeriodSeconds }}
+      {{- if .additionalPodConfig }}
+      {{- toYaml .additionalPodConfig | nindent 6 }}
+      {{- end }}
+{{- end }}

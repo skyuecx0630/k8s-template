@@ -1,0 +1,36 @@
+{{- range .Values.apps }}
+{{- if .sampler.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}-sampler
+  annotations:
+    alb.ingress.kubernetes.io/healthcheck-path: {{ .healthCheckPath }}
+    alb.ingress.kubernetes.io/target-group-attributes: "deregistration_delay.timeout_seconds={{ .terminationGracePeriodSeconds }}"
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: {{ .name }}
+  ports:
+    - protocol: TCP
+      port: {{ $.Values.sampler.servicePort }} # Service port number
+      targetPort: {{ $.Values.sampler.port }}
+{{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  annotations:
+    alb.ingress.kubernetes.io/healthcheck-path: {{ .healthCheckPath }}
+    alb.ingress.kubernetes.io/target-group-attributes: "deregistration_delay.timeout_seconds={{ .terminationGracePeriodSeconds }}"
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: {{ .name }}
+  ports:
+    - protocol: TCP
+      port: {{ .servicePort }} # Service port number
+      targetPort: {{ .port }}
+{{- end }}

@@ -1,0 +1,64 @@
+tolerations: []
+#   - key: management
+#     value: app
+
+apps:
+  - name: myapp
+    image: hmoon630/sample-fastapi
+    # serviceAccountName: myapp
+    sampler:
+      enabled: true
+      weight: 50
+
+    port: 8080
+    servicePort: 8080
+    healthCheckPath: /health
+    terminationGracePeriodSeconds: 30
+
+    resources:
+      limits:
+        cpu: 200m
+        memory: 400Mi
+      requests:
+        cpu: 200m
+        memory: 400Mi
+    # env: []
+
+    ## TODO: volume, secret, etc. implementations
+    ## Leave those to be configurable with an additional config object
+    # additionalPodConfig:
+    # additionalContainerConfig:
+
+ingress:
+  enabled: true
+  name: myapp-alb
+  subnets:
+    - skills-public-subnet-a
+    - skills-public-subnet-b
+  securityGroups:
+    - skills-alb-sg
+  rules:
+    - path: /
+      pathType: Exact
+      app: myapp
+
+sampler:
+  image: public.ecr.aws/g1s2t7w5/sampler:latest
+  name: sampler
+  port: 8888
+  servicePort: 8080 # Consistent port number with app
+
+  resources:
+    limits:
+      cpu: 50m
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      memory: 100Mi
+  env:
+    # UPSTREAM_ENDPOINT is evaluated automatically
+    # http://localhost:{{ .port }}
+    - name: IGNORE_PATH
+      value: "/favicon.ico, /helloworld"
+    - name: IGNORE_HEALTH_CHECK
+      value: "1"
