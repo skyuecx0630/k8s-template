@@ -57,7 +57,7 @@ spec:
             - name: PORT
               value: {{ $.Values.sampler.port | quote }}
             - name: UPSTREAM_ENDPOINT
-              value: {{ printf "http://localhost:%d" .port }}
+              value: "http://localhost:{{ .port }}"
             {{- toYaml $.Values.sampler.env | nindent 12 }}
           lifecycle:
             preStop:
@@ -65,7 +65,7 @@ spec:
                 command:
                   - "/bin/sh"
                   - "-c"
-                  - {{ printf "sleep %d" .terminationGracePeriodSeconds | quote }}
+                  - "sleep {{ .terminationGracePeriodSeconds }}"
         {{- end }}
         - image: {{ .image }}
           name: {{ .name }}

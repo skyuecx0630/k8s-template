@@ -1,0 +1,51 @@
+{{- range $index, $targetGroup := (lookup "elbv2.k8s.aws/v1beta1" "TargetGroupBinding" "" "").items }}
+{{- range $index, $service := (lookup "v1" "Service" "" "").items }}
+{{- range $.Values.apps }}
+{{- if eq .name $service.metadata.name }}
+{{- if eq .name $targetGroup.spec.serviceRef.name }}
+{{- $targetGroupIdentifier := regexSplit ":" $targetGroup.spec.targetGroupARN -1 | last }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ .name }}-alb-requests
+spec:
+  scaleTargetRef:
+    name: {{ .name }}
+  minReplicaCount: {{ .minReplicas }}
+  maxReplicaCount: {{ .maxReplicas }}
+
+  pollingInterval: 10
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 60
+          policies:
+            - type: Percent
+              value: 50
+              periodSeconds: 15
+
+  triggers:
+    - type: aws-cloudwatch
+      authenticationRef:
+        name: keda-aws-credentials
+      metadata:
+        namespace: AWS/ApplicationELB
+        # dimensionName: LoadBalancer
+        # dimensionValue: app/myapp-alb/32c5cf1b343a3569
+        expression: SELECT SUM(RequestCount) FROM SCHEMA("AWS/ApplicationELB", LoadBalancer, TargetGroup) WHERE TargetGroup = '{{ $targetGroupIdentifier }}' GROUP BY TargetGroup
+        # metricName: RequestCount
+        metricStat: Sum
+        metricStatPeriod: "60" # Time unit is 60s
+        metricEndTimeOffset: "30" # Skip for latest 30s
+
+        metricCollectionTime: {{ .metricCollectionTime | quote }} # Query for 3 minutes
+
+        targetMetricValue: {{ div (mul .requests (sub 100 (int $service.metadata.annotations.weight))) 100 | quote }}
+        minMetricValue: "0"
+        awsRegion: {{ $.Values.awsRegion }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

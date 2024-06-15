@@ -1,0 +1,10 @@
+---
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: keda-aws-credentials
+spec:
+  podIdentity:
+    provider: aws
+    roleArn: {{ required ".Values.kedaRoleArn should be set" .Values.kedaRoleArn }}
+    identityOwner: keda

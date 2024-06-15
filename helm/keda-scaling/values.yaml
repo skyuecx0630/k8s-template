@@ -1,0 +1,12 @@
+awsRegion: us-east-1
+
+kedaRoleArn: ""
+
+apps:
+  - name: myapp
+    minReplicas: 2
+    maxReplicas: 10
+
+    # (60 / average_processing_time) * queue_size * time_window_in_minutes * 60%
+    requests: 180
+    metricCollectionTime: 180 # Query For 3 minutes

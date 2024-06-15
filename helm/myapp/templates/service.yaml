@@ -25,6 +25,11 @@ metadata:
   annotations:
     alb.ingress.kubernetes.io/healthcheck-path: {{ .healthCheckPath }}
     alb.ingress.kubernetes.io/target-group-attributes: "deregistration_delay.timeout_seconds={{ .terminationGracePeriodSeconds }}"
+    {{- if .sampler.enabled }}
+    weight: {{ sub 100 .sampler.weight | quote }}
+    {{- else }}
+    weight: "100"
+    {{- end }}
 spec:
   type: ClusterIP
   selector:

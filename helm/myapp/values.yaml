@@ -15,6 +15,17 @@ apps:
     healthCheckPath: /health
     terminationGracePeriodSeconds: 30
 
+    # scaling:
+    #   minReplicas: 2
+    #   maxReplicas: 10
+    #   hpa:
+    #     targetCPUUtilizationPercentage: 60
+    #     targetMemoryUtilizationPercentage: 80
+    #   # # KEDA scaling is impossible in a single helm chart
+    #   # # Use the keda-scaling chart instead.
+    #   # keda:
+    #   #   requests: 300
+
     resources:
       limits:
         cpu: 200m
