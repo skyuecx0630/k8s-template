@@ -23,9 +23,11 @@ metadata:
     alb.ingress.kubernetes.io/actions.response-404: >
       {"type":"fixed-response","fixedResponseConfig":{"contentType":"text/plain","statusCode":"404","messageBody":"404 Not Found"}}
     {{- range $.Values.apps }}
+    {{- if .sampler }}
     {{- if .sampler.enabled }}
     alb.ingress.kubernetes.io/actions.{{ .name }}-sampling: |-
       {"type":"forward","forwardConfig":{"targetGroups":[{"serviceName":"{{ .name }}","servicePort":{{ .servicePort }},"weight":{{ sub 100 .sampler.weight }}},{"serviceName":"{{ .name }}-sampler","servicePort":{{ $.Values.sampler.servicePort }},"weight":{{ .sampler.weight }}}]}}
+    {{- end }}
     {{- end }}
     {{- end }}
     # alb.ingress.kubernetes.io/actions.myapp-sampling: >
@@ -53,6 +55,7 @@ spec:
               service:
               {{- range $.Values.apps }}
               {{- if eq $app .name }}
+              {{- if .sampler }}
                 {{- if .sampler.enabled }}
                 name: {{ .name }}-sampling
                 port:
@@ -60,8 +63,13 @@ spec:
                 {{- else }}
                 name: {{ .name }}
                 port:
-                  number: {{ .port }}
+                  number: {{ .servicePort }}
                 {{- end }}
+              {{- else }}
+                name: {{ .name }}
+                port:
+                  number: {{ .servicePort }}
+              {{- end }}
               {{- end }}
               {{- end }}
     {{- end }}

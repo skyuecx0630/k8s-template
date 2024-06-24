@@ -42,6 +42,7 @@ spec:
       {{- end }}
       {{- end }}
       containers:
+        {{- if .sampler }}
         {{- if .sampler.enabled }}
         - image: {{ $.Values.sampler.image }}
           imagePullPolicy: Always
@@ -68,12 +69,15 @@ spec:
                   - "-c"
                   - "sleep {{ .terminationGracePeriodSeconds }}"
         {{- end }}
+        {{- end }}
         - image: {{ .image }}
           name: {{ .name }}
           ports:
             - containerPort: {{ .port }}
+          {{- if .resources }}
           resources:
             {{- toYaml .resources | nindent 12 }}
+          {{- end }}
           {{- if .env }}
           env:
             {{- toYaml .env | nindent 12 }}

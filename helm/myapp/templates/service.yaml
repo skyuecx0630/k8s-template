@@ -1,4 +1,5 @@
 {{- range .Values.apps }}
+{{- if .sampler }}
 {{- if .sampler.enabled }}
 ---
 apiVersion: v1
@@ -17,6 +18,7 @@ spec:
       port: {{ $.Values.sampler.servicePort }} # Service port number
       targetPort: {{ $.Values.sampler.port }}
 {{- end }}
+{{- end }}
 ---
 apiVersion: v1
 kind: Service
@@ -25,11 +27,15 @@ metadata:
   annotations:
     alb.ingress.kubernetes.io/healthcheck-path: {{ .healthCheckPath }}
     alb.ingress.kubernetes.io/target-group-attributes: "deregistration_delay.timeout_seconds={{ .terminationGracePeriodSeconds }}"
+  {{- if .sampler }}
     {{- if .sampler.enabled }}
     weight: {{ sub 100 .sampler.weight | quote }}
     {{- else }}
     weight: "100"
     {{- end }}
+  {{- else }}
+    weight: "100"
+  {{- end }}
 spec:
   type: ClusterIP
   selector:
