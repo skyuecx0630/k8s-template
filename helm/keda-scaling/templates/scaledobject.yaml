@@ -42,7 +42,7 @@ spec:
 
         metricCollectionTime: {{ .metricCollectionTime | quote }} # Query for 3 minutes
 
-        targetMetricValue: {{ div (mul .requests (sub 100 (int $service.metadata.annotations.weight))) 100 | quote }}
+        targetMetricValue: {{ div (mul .requests (int $service.metadata.annotations.weight)) 100 | quote }}
         minMetricValue: "0"
         awsRegion: {{ $.Values.awsRegion }}
 {{- end }}
