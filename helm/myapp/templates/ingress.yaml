@@ -57,7 +57,6 @@ spec:
                 name: {{ .name }}-sampling
                 port:
                   name: use-annotation
-                {{- end }}
                 {{- else }}
                 name: {{ .name }}
                 port:
@@ -75,4 +74,5 @@ spec:
     #             name: myapp-sampling
     #             port:
     #               name: use-annotation
+{{- end }}
 {{- end }}

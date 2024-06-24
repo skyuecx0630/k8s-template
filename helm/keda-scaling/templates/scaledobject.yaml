@@ -4,6 +4,7 @@
 {{- if eq .name $service.metadata.name }}
 {{- if eq .name $targetGroup.spec.serviceRef.name }}
 {{- $targetGroupIdentifier := regexSplit ":" $targetGroup.spec.targetGroupARN -1 | last }}
+---
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
