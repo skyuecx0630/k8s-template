@@ -41,6 +41,7 @@ spec:
         {{ .key }}: {{ .value }}
       {{- end }}
       {{- end }}
+      terminationGracePeriodSeconds: {{ .terminationGracePeriodSeconds }}
       containers:
         {{- if .sampler }}
         {{- if .sampler.enabled }}
@@ -98,10 +99,28 @@ spec:
                   - "/bin/sh"
                   - "-c"
                   - "sleep {{ .terminationGracePeriodSeconds }}"
+          {{- if .mountPath }}
+          {{- if $.Values.efs }}
+          {{- if $.Values.efs.enabled }}
+          volumeMounts:
+            - name: persistent-storage
+              mountPath: {{ .mountPath }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
           {{- if .additionalContainerConfig }}
           {{- toYaml .additionalContainerConfig | nindent 10 }}
           {{- end }}
-      terminationGracePeriodSeconds: {{ .terminationGracePeriodSeconds }}
+      {{- if .mountPath }}
+      {{- if $.Values.efs }}
+      {{- if $.Values.efs.enabled }}
+      volumes:
+        - name: persistent-storage
+          persistentVolumeClaim:
+            claimName: efs-claim
+      {{- end }}
+      {{- end }}
+      {{- end }}
       {{- if .additionalPodConfig }}
       {{- toYaml .additionalPodConfig | nindent 6 }}
       {{- end }}
