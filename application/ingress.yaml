@@ -16,7 +16,7 @@ metadata:
     alb.ingress.kubernetes.io/healthcheck-timeout-seconds: "3"
     alb.ingress.kubernetes.io/unhealthy-threshold-count: "3"
     alb.ingress.kubernetes.io/healthy-threshold-count: "2" # minimum 2
-    alb.ingress.kubernetes.io/target-group-attributes: deregistration_delay.timeout_seconds=30
+    alb.ingress.kubernetes.io/target-group-attributes: "load_balancing.algorithm.type=least_outstanding_requests,deregistration_delay.timeout_seconds=30"
 
     alb.ingress.kubernetes.io/actions.response-404: >
       {"type":"fixed-response","fixedResponseConfig":{"contentType":"text/plain","statusCode":"404","messageBody":"404 Not Found"}}

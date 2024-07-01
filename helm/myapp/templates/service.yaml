@@ -8,7 +8,7 @@ metadata:
   name: {{ .name }}-sampler
   annotations:
     alb.ingress.kubernetes.io/healthcheck-path: {{ .healthCheckPath }}
-    alb.ingress.kubernetes.io/target-group-attributes: "deregistration_delay.timeout_seconds={{ .terminationGracePeriodSeconds }}"
+    alb.ingress.kubernetes.io/target-group-attributes: "load_balancing.algorithm.type=least_outstanding_requests,deregistration_delay.timeout_seconds={{ .terminationGracePeriodSeconds }}"
 spec:
   type: ClusterIP
   selector:
@@ -26,7 +26,7 @@ metadata:
   name: {{ .name }}
   annotations:
     alb.ingress.kubernetes.io/healthcheck-path: {{ .healthCheckPath }}
-    alb.ingress.kubernetes.io/target-group-attributes: "deregistration_delay.timeout_seconds={{ .terminationGracePeriodSeconds }}"
+    alb.ingress.kubernetes.io/target-group-attributes: "load_balancing.algorithm.type=least_outstanding_requests,deregistration_delay.timeout_seconds={{ .terminationGracePeriodSeconds }}"
   {{- if .sampler }}
     {{- if .sampler.enabled }}
     weight: {{ sub 100 .sampler.weight | quote }}
