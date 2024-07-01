@@ -4,7 +4,7 @@ tolerations: []
 
 apps:
   - name: myapp
-    image: hmoon630/sample-fastapi
+    image: hmoon630/sample-fastapi:latest
     # serviceAccountName: myapp
     sampler:
       enabled: true # Set `weight: 0` first before you disable
@@ -27,15 +27,15 @@ apps:
     #   #   requests: 300
 
     resources:
-      limits:
-        cpu: 200m
-        memory: 400Mi
+      # limits:
+      #   cpu: 200m
+      #   memory: 400Mi
       requests:
-        cpu: 200m
-        memory: 400Mi
+        cpu: 100m
+        memory: 200Mi
     # env: []
 
-    mountPath: /data
+    # mountPath: /data
 
     ## TODO: volume, secret, etc. implementations
     ## Leave those to be configurable with an additional config object
@@ -55,9 +55,9 @@ ingress:
       pathType: Exact
       app: myapp
 
-efs:
-  enabled: true
-  volumeHandle: fs-0d257f6754bc3c3ef::fsap-044f8af71682958d2 # fs-12345678 | fs-12345678::fsap-12345678
+# efs:
+#   enabled: true
+#   volumeHandle: fs-0d257f6754bc3c3ef::fsap-044f8af71682958d2 # fs-12345678 | fs-12345678::fsap-12345678
 
 sampler:
   image: public.ecr.aws/g1s2t7w5/sampler:latest
@@ -66,9 +66,9 @@ sampler:
   servicePort: 8080 # Consistent port number with app
 
   resources:
-    limits:
-      cpu: 50m
-      memory: 100Mi
+    # limits:
+    #   cpu: 50m
+    #   memory: 100Mi
     requests:
       cpu: 50m
       memory: 100Mi
