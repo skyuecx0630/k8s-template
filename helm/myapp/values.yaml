@@ -7,7 +7,7 @@ apps:
     image: hmoon630/sample-fastapi
     # serviceAccountName: myapp
     sampler:
-      enabled: true
+      enabled: true # Set `weight: 0` first before you disable
       weight: 50
 
     port: 8080
