@@ -47,7 +47,7 @@ helm upgrade --install aws-load-balancer-controller eks/aws-load-balancer-contro
     --set clusterName=$CLUSTER \
     --set serviceAccount.create=false \
     --set serviceAccount.name=aws-load-balancer-controller \
-    --set region=<REGION> \  
-    --set vpcId=<VPC_ID> \ 
+    --set region=$(aws configure get region) \
+    --set vpcId=$(aws eks describe-cluster --name $CLUSTER --query cluster.resourcesVpcConfig.vpcId --output text) \
     $HELM_TOLERATION
 ```
