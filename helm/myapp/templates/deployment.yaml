@@ -124,4 +124,14 @@ spec:
       {{- if .additionalPodConfig }}
       {{- toYaml .additionalPodConfig | nindent 6 }}
       {{- end }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .name }}
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .name }}
 {{- end }}
