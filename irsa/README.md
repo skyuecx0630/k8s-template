@@ -23,7 +23,7 @@ cat << EOF > /tmp/$POLICY_NAME.json
 }
 EOF
 
-POLICY_ARN=$(aws iam create-policy --policy-name $POLICY_NAME --policy-document file:///tmp/$POLICY_NAME.json --query Policy.Arn --output text)
+aws iam create-policy --policy-name $POLICY_NAME --policy-document file:///tmp/$POLICY_NAME.json --query Policy.Arn --output text
 
 # Create IRSA
 eksctl create iamserviceaccount \
@@ -31,7 +31,7 @@ eksctl create iamserviceaccount \
     --namespace $NAMESPACE \
     --cluster $CLUSTER \
     --role-name $ROLE_NAME \
-    --attach-policy-arn $POLICY_ARN \
+    --attach-policy-arn=arn:aws:iam::$AWS_ACCOUNT_ID:policy/$POLICY_NAME \
     --override-existing-serviceaccounts \
     --approve &
 ```

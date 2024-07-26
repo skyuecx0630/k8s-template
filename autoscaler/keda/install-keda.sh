@@ -17,6 +17,7 @@ eksctl create iamserviceaccount \
     --cluster=$CLUSTER \
     --namespace=keda \
     --name=keda-operator \
+    --role-name=keda-operator-role \
     --attach-policy-arn=arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess \
     --override-existing-serviceaccounts \
     --approve &
