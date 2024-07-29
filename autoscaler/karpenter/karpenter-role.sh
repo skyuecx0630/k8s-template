@@ -232,9 +232,12 @@ eksctl create iamserviceaccount \
   --role-only \
   --approve
 
-kubectl get cm -n kube-system aws-auth -o yaml | yq e ".data.mapRoles += \
-\"- groups:
+MAP_ROLES=$(kubectl get cm -n kube-system aws-auth -o json | jq ".data.mapRoles | . += \"
+- groups:
   - system:bootstrappers
   - system:nodes
   rolearn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/${KARPENTER_INSTANCE_ROLE_NAME}
   username: system:node:{{EC2PrivateDNSName}}\""
+)
+
+kubectl patch cm aws-auth -n kube-system --type merge --patch '{"data": {"mapRoles": '"$MAP_ROLES"'}}'
