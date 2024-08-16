@@ -8,5 +8,7 @@ spec:
       app.kubernetes.io/name: myapp
   securityGroups:
     groupIds:
+      # Take care of outbounds to CoreDNS
+      # Or use the same security group with nodes
       - sg-04bfac281fc9246ec
       - sg-055394114cec188b0
