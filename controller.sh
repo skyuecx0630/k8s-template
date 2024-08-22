@@ -183,10 +183,10 @@ install_aws_load_balancer_controller () {
 }
 
 
-# install_aws_load_balancer_controller
 # install_metrics_server
 # install_cluster_autoscaler
 # install_keda
+# install_aws_load_balancer_controller
 
 
 # create_irsa skills root skills-root-role
