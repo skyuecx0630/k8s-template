@@ -1,6 +1,7 @@
 awsRegion: us-east-1
 
 kedaRoleArn: ""
+# kedaRoleArn: "arn:aws:iam::111111111111:role/keda-operator-role"
 
 apps:
   - name: myapp
