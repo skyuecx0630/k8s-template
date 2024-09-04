@@ -44,7 +44,9 @@ apps:
 
 ingress:
   enabled: true
-  name: myapp-alb
+  name: skills-alb
+  # logBucket: skills-1234-logs
+  # logPrefix: alb
   subnets:
     - skills-public-subnet-a
     - skills-public-subnet-b

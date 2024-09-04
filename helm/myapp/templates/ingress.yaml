@@ -11,7 +11,11 @@ metadata:
     alb.ingress.kubernetes.io/subnets: {{ join ", " .subnets }} # Use name tag of subnet. Or subnet id
     alb.ingress.kubernetes.io/security-groups: {{ join ", " .securityGroups }}
     # alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
-    # alb.ingress.kubernetes.io/load-balancer-attributes: access_logs.s3.enabled=true,access_logs.s3.bucket=MY_LOG_BUCKET
+    {{- if .logBucket }}
+    {{- if .logPrefix }}
+    alb.ingress.kubernetes.io/load-balancer-attributes: access_logs.s3.enabled=true,access_logs.s3.prefix={{ .logPrefix }},access_logs.s3.bucket={{ .logBucket }}
+    {{- end }}
+    {{- end }}
 
     # alb.ingress.kubernetes.io/healthcheck-path: /health
     alb.ingress.kubernetes.io/healthcheck-interval-seconds: "5"
