@@ -189,4 +189,7 @@ install_aws_load_balancer_controller () {
 # install_aws_load_balancer_controller
 
 
+# create_irsa amazon-cloudwatch cloudwatch-agent skills-cloudwatch-role
+# attach_policy_to_role skills-cloudwatch-role arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+
 # create_irsa skills root skills-root-role
